@@ -8,6 +8,7 @@ function Main() {
         <Router>
             <Route path="/login/" exact component={Login}/>
             <Route path="/index/"  component={AdminIndex}/>
+
         </Router>
 
     )
