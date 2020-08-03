@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from "react";
 import 'antd/dist/antd.css'
-import {Card, Input, Button, Spin} from "antd";
+import {Card, Input, Button, Spin, message} from "antd";
 import {UserOutlined, LockOutlined } from '@ant-design/icons';
 import '../static/css/Login.css'
+import axios from 'axios'
+import servicePath from '../config/apiUrl'
 
-function Login() {
+function Login(props) {
 
 
     const [userName, setUserName] = useState('')
@@ -13,6 +15,42 @@ function Login() {
 
     const checkLogin = () => {
         setIsLoading(true)
+        if(!userName){
+            message.error('Please input username')
+            setTimeout(()=>{setIsLoading(false)},
+            500)
+            return false
+        }else if(!password){
+            message.error('Please input password')
+            setTimeout(()=>{setIsLoading(false)},
+            500)
+            return false
+        }
+        let dataProps = {
+            'userName': userName,
+            'password': password
+        }
+
+        // console.log(dataProps)
+
+        axios({
+            method: 'post',
+            url: servicePath.checkLogin,
+            data: dataProps,
+            withCredentials: true
+        }).then (
+            res=>{
+                setIsLoading(false)
+                if(res.data.data == 'Login successful'){
+                   
+                    localStorage.setItem('openId', res.data.openId)
+                    props.history.push('/index')
+                }else {
+                    message.error("wrong username or password")
+                }
+            }
+        )
+
         setTimeout(()=>{
             setIsLoading(false)
         }, 1000)
