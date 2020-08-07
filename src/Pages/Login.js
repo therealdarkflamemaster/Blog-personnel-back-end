@@ -42,7 +42,7 @@ function Login(props) {
             res=>{
                 setIsLoading(false)
                 if(res.data.data == 'Login successful'){
-                   
+                    console.log(res.data.openId)
                     localStorage.setItem('openId', res.data.openId)
                     props.history.push('/index')
                 }else {
