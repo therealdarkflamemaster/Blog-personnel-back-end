@@ -24,6 +24,12 @@ function AddArticle(props) {
 
     useEffect(()=>{
         getTypeInfo()
+        //获取文章id
+        let tmpId = props.match.params.id // router获取的参数
+        if(tmpId){
+            setArticleId(tmpId)
+            getArticleById(tmpId)
+        }
     },[])
 
     marked.setOptions({
@@ -142,6 +148,26 @@ function AddArticle(props) {
 
     }
 
+    const getArticleById = (id) => {
+        axios(servicePath.getArticleById+id, {withCredentials:true})
+            .then(
+                res => {
+                    console.log(res.data.data[0]);
+                    let articleInfo = res.data.data[0];
+                    setArticleTitle(articleInfo.title)
+                    setArticleContent(articleInfo.article_content)
+
+                    let html = marked(articleInfo.article_content)
+                    setMarkdownContent(html)
+                    setIntroducemd(articleInfo.introduce)
+                    let tmpInt = marked(articleInfo.introduce)
+                    setIntroducehtml(tmpInt)
+                    setShowDate(articleInfo.addTime)
+                    setSelectType(articleInfo.typeId)
+                }
+            )
+    }
+
     return (
         <div>
            <Row gutter={5}>
@@ -157,7 +183,7 @@ function AddArticle(props) {
                        </Col>
                        <Col span={4}>
                            &nbsp;
-                           <Select defaultValue={selectedType} size="large" onChange={selectTypeHandler}>
+                           <Select defaultValue={selectedType} size="large" value={selectedType} onChange={selectTypeHandler}>
                                {
                                    typeInfo.map((item,index)=>{
                                        return(
@@ -175,6 +201,7 @@ function AddArticle(props) {
                                className="markdown-content"
                                rows={35}
                                placeholder="Content of the Article"
+                               value={articleContent}
                                onChange={changeContent}
                            />
                        </Col>
@@ -198,6 +225,7 @@ function AddArticle(props) {
                                 rows={4}
                                 placeholder="Introduction of article"
                                 onChange={changeIntroduce}
+                                value={introducemd}
                             />
                             <br/>
                             <br/>
