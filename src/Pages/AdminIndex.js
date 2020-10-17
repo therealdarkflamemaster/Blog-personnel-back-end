@@ -27,7 +27,9 @@ function AdminIndex(props) {
     const handleClickArticle = (e) => {
         if(e.key === 'addArticle'){
             props.history.push('/index/add/')
-        }else{
+        }else if (e.key === '2'){
+            props.history.push('/index/list')
+        }else if (e.key === '3'){
             props.history.push('/index/list')
         }
     }
@@ -37,9 +39,12 @@ function AdminIndex(props) {
         <Layout style={{ minHeight: '100vh' }}>
                <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
                     <div className="logo" />
-                    <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-                        <Menu.Item key="1" icon={<PieChartOutlined />}>
-                            工作台
+                    <Menu theme="dark" defaultSelectedKeys={['articleList']} mode="inline">
+                        <Menu.Item
+                            key="articleList"
+                            onClick={handleClickArticle}
+                        >
+                            文章列表
                         </Menu.Item>
                         <Menu.Item
                             key="addArticle"
@@ -49,17 +54,16 @@ function AdminIndex(props) {
                             添加文章
                         </Menu.Item>
                         <Menu.Item
-                            key="articleList"
-                            onClick={handleClickArticle}
-                        >
-                            文章列表
-                        </Menu.Item>
-
-                        <Menu.Item
                             key="2"
                             onClick={handleClickArticle}
                         >
                             文章管理
+                        </Menu.Item>
+                        <Menu.Item
+                            key="3"
+                            onClick={handleClickArticle}
+                        >
+                            标签管理
                         </Menu.Item>
 
 
@@ -87,7 +91,7 @@ function AdminIndex(props) {
                             </div>
                         </div>
                     </Content>
-                    <Footer style={{ textAlign: 'center' }}>darkflamemaster.com</Footer>
+                    <Footer style={{ textAlign: 'center' }}>shengxiang'sBLOG.com</Footer>
                 </Layout>
             </Layout>
         );
