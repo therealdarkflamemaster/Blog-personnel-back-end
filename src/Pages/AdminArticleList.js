@@ -10,7 +10,7 @@ import '../static/css/ArticleList.css';
 
 const {confirm} = Modal
 
-class ArticleList extends Component {
+class AdminArticleList extends Component {
 
 
     constructor(props) {
@@ -200,4 +200,4 @@ class ArticleList extends Component {
     }
 }
 
-export default ArticleList
+export default AdminArticleList
