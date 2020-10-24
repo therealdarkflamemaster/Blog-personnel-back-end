@@ -13,6 +13,8 @@ import {
 import {Route} from 'react-router-dom'
 import AddArticle from "./AddArticle";
 import AdminArticleList from "./AdminArticleList"
+import AddTag from "./AddTag";
+import ArticleList from "./ArticleList";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -32,9 +34,9 @@ function AdminIndex(props) {
         }else if (e.key === 'articleList'){
             props.history.push('/index/list')
         }else if (e.key === '2'){
-            props.history.push('/index/list')
-        }else if (e.key === '3'){
-            props.history.push('/index/list')
+            props.history.push('/index/adminList')
+        }else if (e.key === '8'){
+            props.history.push('/index/addTag')
         }
     }
 
@@ -66,7 +68,7 @@ function AdminIndex(props) {
                             文章管理
                         </Menu.Item>
                         <SubMenu key="3" icon={<TagsOutlined />} title="Tags">
-                            <Menu.Item key="8" icon={<PlusCircleOutlined />}>添加</Menu.Item>
+                            <Menu.Item key="8" icon={<PlusCircleOutlined />} onClick={handleClickArticle}>添加</Menu.Item>
                             <Menu.Item key="6" icon={<MinusCircleOutlined />}>删减，修改</Menu.Item>
                         </SubMenu>
                         <Menu.Item key="9" icon={<FileOutlined />}>
@@ -84,12 +86,14 @@ function AdminIndex(props) {
                             <div>
                                 <Route path="/index/" exact component={AddArticle} />
                                 <Route path="/index/add/" exact component={AddArticle} />
-                                <Route path="/index/list/" exact component={AdminArticleList} />
+                                <Route path="/index/list/" exact component={ArticleList} />
                                 <Route path="/index/add/:id" exact component={AddArticle} />
+                                <Route path="/index/addTag" exact component={AddTag} />
+                                <Route path="/index/adminList" exact component={AdminArticleList} />
                             </div>
                         </div>
                     </Content>
-                    <Footer style={{ textAlign: 'center' }}>shengxiang'sBLOG.com</Footer>
+                    <Footer style={{ textAlign: 'center' }}>shengxiang's BLOG.com</Footer>
                 </Layout>
             </Layout>
         );

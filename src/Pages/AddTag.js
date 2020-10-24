@@ -1,19 +1,17 @@
 import React, {Component} from "react";
-import {Input, Row, Col, Modal, message, Button, Table, Space, Tag, Divider } from 'antd';
+import {Input, Row, Col, Modal, message, Button, Table, Space, Divider} from 'antd';
 import {
-    SearchOutlined
+    SearchOutlined,
+    TagOutlined,
 } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import axios from 'axios'
 import servicePath from "../config/apiUrl";
 import '../static/css/ArticleList.css';
-import '../static/css/AdminArticleList.css';
 
 const {confirm} = Modal
 
-const { CheckableTag } = Tag;
-
-class AdminArticleList extends Component {
+class AddTag extends Component {
 
 
     constructor(props) {
@@ -22,12 +20,13 @@ class AdminArticleList extends Component {
 
     state = {
         list: [],
-        tags: [],
-        tagSelected: '',
         user: {},
         loading: true, // pour le tableau
         searchText: '',
         searchedColumn: '',
+        newTag: '',
+        articleRowsSelected: [],
+        pushLoading: false,
     };
 
     componentDidMount() {
@@ -45,48 +44,15 @@ class AdminArticleList extends Component {
         }).then(
             res => {
                 this.setState({
-                    list: res.data.list
-                })
-            }
-        )
-        axios({
-            method:'get',
-            url:servicePath.getTags,
-            withCredentials: true
-        }).then(
-            res => {
-                this.setState({
-                    tags: res.data.data,
+                    list: res.data.list,
                     loading: false
                 })
             }
         )
-
     }
 
-    // delete article
-    delArticle = (id) => {
-        confirm({
-            title: 'Are you sure to delete ?',
-            content: 'press ok to delete ',
-            onOk(){
-                axios(servicePath.delArticle+id, {withCredentials:true}).then(
-                    res => {
-                        message.success('delete successfully')
-                        fetch()
-                    }
-                )
-            },
-            onCancel(){
-                message.success('no change')
-            }
-        })
-    }
 
-    // 修改文章的跳转方法
-    updateArticle = (id, checked) => {
-        this.props.history.push('/index/add/'+id)
-    }
+
 
     handleReset = clearFilters => {
         clearFilters();
@@ -151,36 +117,28 @@ class AdminArticleList extends Component {
         });
     };
 
-    handleChange = (tag, checked) => {
-
-        // make it to 'only one at a time'
-        const nextSelectedTag = checked ? [tag] : this.state.tagSelected.filter(t => t !== tag);
-        this.setState({
-            tagSelected: nextSelectedTag
-        })
-        if(nextSelectedTag.length === 1){
-            axios({
-                method:'get',
-                url:servicePath.getArticlesByTagId+nextSelectedTag[0]["Id"],
-                withCredentials: true
-            }).then(
-                res => {
-                    this.setState({
-                        list: res["data"]["data"]
-                    })
-                }
-            )
-
+    pushTag = () => {
+        let dataProps = {}
+        dataProps.name = this.state.newTag;
+        console.log(dataProps);
+        if(dataProps.name === ''){
+            message.error('not allowing empty tag!')
         }else {
             axios({
-                method:'get',
-                url:servicePath.getArticleList,
+                method: 'post',
+                url: servicePath.addTag,
+                data: dataProps,
                 withCredentials: true
             }).then(
                 res => {
-                    this.setState({
-                        list: res.data.list
-                    })
+                    if(res.data.isSuccess) {
+                        message.success("update successfully")
+                        this.setState({
+                            newTag: ''
+                        })
+                    } else {
+                        message.error(res)
+                    }
                 }
             )
         }
@@ -221,48 +179,34 @@ class AdminArticleList extends Component {
                 sorter: (a, b) => a.view_count - b.view_count,
                 sortDirections: ['ascend','descend'],
             },
-            {
-                title: 'Action',
-                key: 'action',
-                render: (record) => (
-                    <Space size="middle">
-                        <Button
-                            type="primary"
-                            style={{marginRight:'1rem'}}
-                            onClick={()=>{this.updateArticle(record.id)}}
-                        >
-                            修改
-                        </Button>
-                        <Button onClick={()=>{this.delArticle(record.id)}}>删除</Button>
-                    </Space>
-                ),
-            },
         ];
         const { list, loading,} = this.state;
 
         return (
             <div>
-                <div className="title">
-                    Tags filtration
+                <div>
+                    <Space>
+                        <Input
+                            placeholder="enter Tag Name"
+                            addonBefore={<TagOutlined />}
+                            value={this.state.newTag}
+                            onChange={(event => this.setState({
+                                newTag: event.target.value
+                            }))}
+                            onPressEnter={this.pushTag.bind(this)}
+                        />
+                        <Button type="primary" onClick={this.pushTag.bind(this)}>Confirm</Button>
+                    </Space>
                 </div>
-                <span className="tags-title">Tags :</span>
-                {this.state.tags.map(tag => (
-                    <CheckableTag
-                        key={tag["Id"]}
-                        checked={this.state.tagSelected.indexOf(tag) > -1}
-                        onChange={checked => this.handleChange(tag, checked)}
-                    >
-                        {tag["name"]}
-                    </CheckableTag>
-                ))}
-                <Divider/>
+                <br/>
+
                 <Table
                     tableLayout="auto"
                     size="middle"
                     columns={columns}
                     dataSource={list}
                     loading = {loading}
-                    rowKey = {data => data["title"]}
+                    rowKey = {data => data["Id"]}
                 />
             </div>
 
@@ -270,4 +214,4 @@ class AdminArticleList extends Component {
     }
 }
 
-export default AdminArticleList
+export default AddTag

@@ -56,7 +56,7 @@ class ArticleList extends Component {
                 axios(servicePath.delArticle+id, {withCredentials:true}).then(
                     res => {
                         message.success('delete successfully')
-                        fetch()
+                        this.fetch()
                     }
                 )
             },
