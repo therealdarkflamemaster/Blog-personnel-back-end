@@ -12,6 +12,7 @@ let servicePath = {
     getArticlesByTagId: ipUrl+ 'getArticlesByTagId/', // 通过tag id过滤出 文章
     getTagsComplete: ipUrl+ 'getTagsComplete', //获得较为完整的tag 信息
     addTag: ipUrl+ 'addTag', //添加新的Tag
+    addArticleToTag: ipUrl+ 'addArticleToTag', //添加新的tag和article之间的链接
 }
 
 export default servicePath

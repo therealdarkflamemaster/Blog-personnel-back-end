@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Input, Row, Col, Modal, message, Button, Table, Space, Divider} from 'antd';
+import {Input, Row, Col, Modal, message, Button, Table, Space, Tag} from 'antd';
 import {
     SearchOutlined,
     TagOutlined,
@@ -26,7 +26,9 @@ class AddTag extends Component {
         searchedColumn: '',
         newTag: '',
         articleRowsSelected: [],
-        pushLoading: false,
+        pushLoading: false, // pour le button
+        tagCompleted: false, // pour controller le state de Component button en haut de la page
+        newTagId:0,
     };
 
     componentDidMount() {
@@ -117,6 +119,35 @@ class AddTag extends Component {
         });
     };
 
+    startLinkNewTag = () => {
+        this.setState({
+            pushLoading: true
+        })
+        console.log(this.state.articleRowsSelected, this.state.newTagId)
+
+
+
+        setTimeout(() => {
+            this.state.articleRowsSelected.map(articleId => {
+                let dataProps = {
+                    "article_id": articleId,
+                    "tag_id": this.state.newTagId
+                }
+                axios({
+                    method: 'post',
+                    url: servicePath.addArticleToTag,
+                    data: dataProps,
+                    withCredentials: true
+                }).then(res => console.log(res))
+            })
+            this.setState({
+                articleRowsSelected: [],
+                pushLoading: false,
+            });
+        }, 1000);
+    }
+
+
     pushTag = () => {
         let dataProps = {}
         dataProps.name = this.state.newTag;
@@ -134,7 +165,8 @@ class AddTag extends Component {
                     if(res.data.isSuccess) {
                         message.success("update successfully")
                         this.setState({
-                            newTag: ''
+                            tagCompleted: true,
+                            newTagId: res["data"]["insertId"],
                         })
                     } else {
                         message.error(res)
@@ -144,6 +176,10 @@ class AddTag extends Component {
         }
 
     }
+
+    onSelectChange = articleRowsSelected => {
+        this.setState({ articleRowsSelected });
+    };
 
 
     render() {
@@ -180,33 +216,60 @@ class AddTag extends Component {
                 sortDirections: ['ascend','descend'],
             },
         ];
-        const { list, loading,} = this.state;
+
+
+
+        const { list, loading, pushLoading, articleRowsSelected, tagCompleted, newTag } = this.state;
+
+        const rowSelection = {
+            articleRowsSelected,
+            onChange: this.onSelectChange,
+        };
+
+        const hasSelected = articleRowsSelected.length > 0;
+
 
         return (
             <div>
                 <div>
-                    <Space>
-                        <Input
-                            placeholder="enter Tag Name"
-                            addonBefore={<TagOutlined />}
-                            value={this.state.newTag}
-                            onChange={(event => this.setState({
-                                newTag: event.target.value
-                            }))}
-                            onPressEnter={this.pushTag.bind(this)}
-                        />
-                        <Button type="primary" onClick={this.pushTag.bind(this)}>Confirm</Button>
-                    </Space>
+                        {!tagCompleted ?
+                            <Space>
+                                <Input
+                                    placeholder="enter Tag Name"
+                                    addonBefore={<TagOutlined />}
+                                    value={this.state.newTag}
+                                    onChange={(event => this.setState({
+                                        newTag: event.target.value
+                                    }))}
+                                    onPressEnter={this.pushTag.bind(this)}
+                                />
+                                <Button type="primary" onClick={this.pushTag.bind(this)}>Confirm</Button>
+                            </Space>
+                            :
+                            <div>
+                                <div style={{marginBottom: 8}}>
+                                   New Tag : <Tag color="#87d068">{newTag}</Tag>
+                                </div>
+                                <Button type="primary" onClick={this.startLinkNewTag} disabled={!hasSelected} loading={pushLoading}>
+                                    Link to
+                                </Button>
+                                <span style={{ marginLeft: 8 }}>
+                                    {hasSelected ? `Selected ${articleRowsSelected.length} items` : ''}
+                                </span>
+                            </div>
+                        }
+
+
                 </div>
                 <br/>
-
                 <Table
+                    rowSelection={rowSelection}
                     tableLayout="auto"
                     size="middle"
                     columns={columns}
                     dataSource={list}
                     loading = {loading}
-                    rowKey = {data => data["Id"]}
+                    rowKey = {data => data["id"]}
                 />
             </div>
 
