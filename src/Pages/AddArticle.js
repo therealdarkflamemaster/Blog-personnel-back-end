@@ -1,10 +1,14 @@
 import React, {useState, useEffect} from "react";
 import marked from 'marked';
 import '../static/css/AddArticle.css'
-import {Row, Col, Input, Select, Button, DatePicker, message} from 'antd'
+import {Row, Col, Input, Select, Button, DatePicker, message, Card, Tag, Tooltip} from 'antd'
 import axios from 'axios'
 import servicePath from '../config/apiUrl'
-import {render} from "react-dom";
+import ArticleTags from "../Components/ArticleTags";
+import {PlusOutlined} from "@ant-design/icons";
+
+
+
 const {Option} = Select
 const {TextArea} = Input
 
@@ -21,6 +25,10 @@ function AddArticle(props) {
     const [updateDate, setUpdateDate] = useState() //修改日志的日期
     const [typeInfo, setTypeInfo] = useState([]) // 文章类别信息
     const [selectedType, setSelectType] = useState("select type") //选择的文章类别
+    const [tags, setTags] = useState([]);
+    const [allTags, setAllTags] = useState([]);
+    const [inputVisible, setInputVisible] = useState(false);
+    const [inputValue, setInputValue] = useState('');
 
     useEffect(()=>{
         getTypeInfo()
@@ -29,6 +37,7 @@ function AddArticle(props) {
         if(tmpId){
             setArticleId(tmpId)
             getArticleById(tmpId)
+
         }
     },[])
 
@@ -166,7 +175,68 @@ function AddArticle(props) {
                     setSelectType(articleInfo.typeId)
                 }
             )
+       axios(servicePath.getTagsByArticleId+id, {withCredentials:true})
+           .then(
+               res => {
+                   setTags(res.data.data);
+               }
+           )
+        axios(servicePath.getTags, {withCredentials:true})
+            .then(
+                res => {
+                    setAllTags(res.data.data);
+                }
+            )
     }
+
+    const handleClose = removedTag => {
+
+        // 删除一个Article的一个选择的Tag
+        axios(servicePath.delLinkByArticleIdAndTagId+articleId+"/"+removedTag.Id, {withCredentials:true})
+            .then(
+                res => {
+                    // console.log(res)
+                    message.success('删除Tag成功');
+                }
+            )
+
+
+        let newTags = tags.filter(tag => tag !== removedTag);
+        setTags(newTags);
+    };
+
+    const showInput = () => {
+        setInputVisible(true);
+
+    };
+
+    const handleInputChange = value => {
+        setInputValue(value)
+        console.log(value);
+        let dataProps = {
+            "article_id": articleId,
+            "tag_id": value
+        }
+        axios({
+            method: 'post',
+            url: servicePath.addArticleToTag,
+            data: dataProps,
+            withCredentials: true
+        }).then(res => {
+            console.log(res)
+            setInputValue('')
+            axios(servicePath.getTagsByArticleId+articleId, {withCredentials:true})
+                .then(
+                    res => {
+                        setTags(res.data.data);
+                        setInputVisible(false);
+                        message.success('添加Tag成功')
+                    }
+                )
+
+        })
+    };
+
 
     return (
         <div>
@@ -241,6 +311,56 @@ function AddArticle(props) {
                                     onChange={(date, dateString)=>{setShowDate(dateString)}}
                                 />
                             </div>
+                        </Col>
+                        <Col span={24}>
+                            <Card>
+                                    {tags.map((tag, index) => {
+
+                                        const isLongTag = tag.length > 20;
+
+                                        const tagElem = (
+                                            <Tag
+                                                className="edit-tag"
+                                                key={tag['Id']}
+                                                closable={true}
+                                                onClose={() => handleClose(tag)}
+                                            >
+                                              <span>
+                                                {isLongTag ? `${tag['name'].slice(0, 20)}...` : tag['name']}
+                                              </span>
+                                            </Tag>
+                                        );
+                                        return isLongTag ? (
+                                            <Tooltip title={tag['name']} key={tag['Id']}>
+                                                {tagElem}
+                                            </Tooltip>
+                                        ) : (
+                                            tagElem
+                                        );
+                                    })}
+                                    {inputVisible && (
+                                        <Select
+                                            showSearch
+                                            style={{ width: 200 }}
+                                            placeholder="Select a tag"
+                                            optionFilterProp="children"
+                                            onChange={value => handleInputChange(value)}
+                                            onBlur={value => handleInputChange(value)}
+                                            filterOption={(input, option) =>
+                                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                        }
+                                            >
+                                        {allTags.map(tag=>
+                                            <Option value={tag["Id"]} key={tag["Id"]}>{tag["name"]}</Option>
+                                        )}
+                                            </Select>
+                                    )}
+                                    {!inputVisible && (
+                                        <Tag className="site-tag-plus" onClick={showInput}>
+                                            <PlusOutlined /> New Tag
+                                        </Tag>
+                                    )}
+                            </Card>
                         </Col>
                     </Row>
                </Col>

@@ -194,7 +194,7 @@ class ArticleList extends Component {
                 columns={columns}
                 dataSource={list}
                 loading = {loading}
-                rowKey = {data => data["Id"]}
+                rowKey = {data => data["title"]}
             />
         );
     }

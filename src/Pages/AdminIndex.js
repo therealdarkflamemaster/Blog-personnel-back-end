@@ -15,6 +15,7 @@ import AddArticle from "./AddArticle";
 import AdminArticleList from "./AdminArticleList"
 import AddTag from "./AddTag";
 import ArticleList from "./ArticleList";
+import DeleteTag from "./DeleteTag"
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -37,6 +38,8 @@ function AdminIndex(props) {
             props.history.push('/index/adminList')
         }else if (e.key === '8'){
             props.history.push('/index/addTag')
+        }else if (e.key === '6'){
+            props.history.push('/index/deleteTag')
         }
     }
 
@@ -69,7 +72,7 @@ function AdminIndex(props) {
                         </Menu.Item>
                         <SubMenu key="3" icon={<TagsOutlined />} title="Tags">
                             <Menu.Item key="8" icon={<PlusCircleOutlined />} onClick={handleClickArticle}>添加</Menu.Item>
-                            <Menu.Item key="6" icon={<MinusCircleOutlined />}>删减，修改</Menu.Item>
+                            <Menu.Item key="6" icon={<MinusCircleOutlined />} onClick={handleClickArticle}>删减，修改</Menu.Item>
                         </SubMenu>
                         <Menu.Item key="9" icon={<FileOutlined />}>
                             <span>留言管理</span>
@@ -90,6 +93,7 @@ function AdminIndex(props) {
                                 <Route path="/index/add/:id" exact component={AddArticle} />
                                 <Route path="/index/addTag" exact component={AddTag} />
                                 <Route path="/index/adminList" exact component={AdminArticleList} />
+                                <Route path="/index/deleteTag" exact component={DeleteTag} />
                             </div>
                         </div>
                     </Content>
