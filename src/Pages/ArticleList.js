@@ -56,7 +56,21 @@ class ArticleList extends Component {
                 axios(servicePath.delArticle+id, {withCredentials:true}).then(
                     res => {
                         message.success('delete successfully')
-                        this.fetch()
+                        this.setState({
+                            loading: true, // pour le tableau Source
+                        });
+                        axios({
+                            method:'get',
+                            url:servicePath.getArticleList,
+                            withCredentials: true
+                        }).then(
+                            res => {
+                                this.setState({
+                                    list: res.data.list,
+                                    loading: false
+                                })
+                            }
+                        )
                     }
                 )
             },

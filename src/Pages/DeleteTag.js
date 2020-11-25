@@ -143,25 +143,21 @@ class DeleteTag extends Component {
     };
 
     deleteTag = (record) => {
-        console.log(record)
         this.setState({
             deleteTag : record
         })
     }
 
     cancel(e) {
-        console.log(e);
         message.info('Have not deleted');
     }
 
     confirm() {
         let record = this.state.deleteTag
         let id = record["Id"];
-        console.log(id);
         let url =  servicePath.delLinkByTagId + id
         axios(url, {withCredentials:true}).then(
             res => {
-                console.log(res)
                 message.success('Delete Links Successfully');
             }
         )
@@ -169,7 +165,6 @@ class DeleteTag extends Component {
         url = servicePath.delTag + id
         axios(url, {withCredentials:true}).then(
             res => {
-                console.log(res)
                 message.success('Delete Tag Successfully');
                 this.fetch();
             }

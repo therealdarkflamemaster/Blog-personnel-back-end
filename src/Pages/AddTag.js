@@ -123,7 +123,7 @@ class AddTag extends Component {
         this.setState({
             pushLoading: true
         })
-        console.log(this.state.articleRowsSelected, this.state.newTagId)
+        // console.log(this.state.articleRowsSelected, this.state.newTagId)
 
 
 
@@ -138,7 +138,7 @@ class AddTag extends Component {
                     url: servicePath.addArticleToTag,
                     data: dataProps,
                     withCredentials: true
-                }).then(res => console.log(res))
+                }).then(res => message.success("Add articles successfully"))
             })
             this.setState({
                 articleRowsSelected: [],
@@ -151,7 +151,7 @@ class AddTag extends Component {
     pushTag = () => {
         let dataProps = {}
         dataProps.name = this.state.newTag;
-        console.log(dataProps);
+        // console.log(dataProps);
         if(dataProps.name === ''){
             message.error('not allowing empty tag!')
         }else {
