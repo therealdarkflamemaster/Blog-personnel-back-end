@@ -38,7 +38,7 @@ function Login(props) {
             url: servicePath.checkLogin,
             data: dataProps,
             withCredentials: true,
-            header:{ 'Access-Control-Allow-Origin':'*' },
+            header:{ 'Access-Control-Allow-Origin': origin },
         }).then (
             res=>{
                 setIsLoading(false)
