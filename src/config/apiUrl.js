@@ -1,4 +1,4 @@
-let ipUrl = 'http://140.238.62.46:7001/admin/'
+let ipUrl = 'https://www.blogshengxiang.tk/admin/'
 
 let servicePath = {
     checkLogin: ipUrl + 'checkLogin', // 检查用户名密码
